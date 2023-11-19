@@ -27,8 +27,19 @@ const getItems = (req, res) => {
     });
 };
 
-//update
-
 //delete
+const deleteItem = (req, res) => {
+  const { itemId } = req.params;
+  console.log(itemId);
 
-module.exports = { createItem, getItems };
+  ClothingItem.findByIdAndDelete(itemId)
+    .orFail()
+    .then((item) => {
+      res.status(204).send({});
+    })
+    .catch((e) => {
+      res.status(500).send({ message: "error from getClothingItems", e });
+    });
+};
+
+module.exports = { createItem, getItems, deleteItem };

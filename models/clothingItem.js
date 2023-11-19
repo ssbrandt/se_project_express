@@ -19,25 +19,25 @@ const clothingItemSchema = new mongoose.Schema({
     validate: {
       validator: (v) => validator.isURL(v),
       message: "Link is not valid",
-    }
+    },
   },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-    required: true,
-    default: {},
-  },
-  likes: {
-    //placeholder to user
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-    required: true,
-    default: {},
-  },
+  // owner: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "user",
+  //   required: true,
+  //   default: {},
+  // },
+  // likes: {
+  //   //placeholder to user
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "user",
+  //   required: true,
+  //   default: {},
+  // },
   createdAt: {
     type: Date,
     default: Date.now(),
   },
 });
 
-model.exports = mongoose.model("clothingItem", ClothingItemSchema);
+module.exports = mongoose.model("clothingItem", clothingItemSchema);

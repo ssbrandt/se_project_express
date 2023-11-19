@@ -13,6 +13,14 @@ mongoose.connect(
   (e) => console.log("DB error", e),
 );
 
+//hard-coded user
+app.use((req, res, next) => {
+  req.user = {
+    _id: "655a9b779a5a9b52a93a66d4",
+  };
+  next();
+});
+
 app.use(express.json());
 const routes = require("./routes");
 app.use(routes);

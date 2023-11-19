@@ -38,7 +38,7 @@ const deleteItem = (req, res) => {
       res.status(204).send({});
     })
     .catch((e) => {
-      res.status(500).send({ message: "error from getClothingItems", e });
+      res.status(500).send({ message: "error from deleteClothingItems", e });
     });
 };
 

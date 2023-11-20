@@ -1,4 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
+const { errors } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const userId = req.user._id;
@@ -13,10 +14,14 @@ const createItem = (req, res) => {
     })
     .catch((e) => {
       console.error(e);
-      if (e.name === "ValidationError" || e.name === "CastError") {
-        res.status(400).send({ message: "Invalid data input", e });
+      if (e.name === "ValidationError") {
+        console.error(e);
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
       } else {
-        res.status(500).send({ message: "Error from createItem", e });
+        console.error(e);
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
       }
     });
 };
@@ -28,7 +33,8 @@ const getItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.error(e);
-      res.status(500).send({ message: "error from getClothingItems", e });
+      const error = errors.INTERNAL_SERVER_ERROR;
+      res.status(error.status).send({ message: error.message });
     });
 };
 
@@ -45,9 +51,11 @@ const deleteItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name == "CastError") {
-        res.status(404).send({ message: "Item Not Found", e });
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
       } else {
-        res.status(500).send({ message: "error from deleteClothingItems", e });
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
       }
     });
 };

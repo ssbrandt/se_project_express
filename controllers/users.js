@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const { errors } = require("../utils/errors");
 
 const getUsers = (req, res) => {
   User.find({})
@@ -6,7 +7,9 @@ const getUsers = (req, res) => {
       res.status(200).send(users);
     })
     .catch((e) => {
-      res.status(500).send({ message: "error from getUsers", e });
+      console.error(e);
+      const error = errors.INTERNAL_SERVER_ERROR;
+      res.status(error.status).send({ message: error.message });
     });
 };
 
@@ -14,6 +17,7 @@ const getUser = (req, res) => {
   const { userId } = req.params;
 
   User.findById(userId)
+    .orFail()
     .then((user) => {
       res.status(200).send(user);
     })
@@ -21,9 +25,12 @@ const getUser = (req, res) => {
       console.error(e);
 
       if (e.name === "CastError") {
-        res.status(404).send({ message: "Item not found" });
+        const error = errors.INVALID_REQUEST;
+        console.log(errors.INVALID_REQUEST);
+        res.status(error.status).send({ message: error.message });
       } else {
-        res.status(500).send({ message: "error from get User" });
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
       }
     });
 };

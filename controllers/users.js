@@ -18,7 +18,13 @@ const getUser = (req, res) => {
       res.status(200).send(user);
     })
     .catch((e) => {
-      res.status(500).send({ message: "error from get User", e });
+      console.error(e);
+
+      if (e.name === "CastError") {
+        res.status(404).send({ message: "Item not found" });
+      } else {
+        res.status(500).send({ message: "error from get User" });
+      }
     });
 };
 
@@ -35,7 +41,12 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      res.status(500).send({ message: "Error from createItem", e });
+      console.error(e);
+      if (e.name === "ValidationError" || e.name === "CastError") {
+        res.status(400).send({ message: "Invalid data input", e });
+      } else {
+        res.status(500).send({ message: "Error from createItem", e });
+      }
     });
 };
 

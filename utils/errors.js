@@ -11,6 +11,10 @@ errors = {
     status: 500,
     message: "An error has occurred on the server.",
   },
+  ROUTER_ERROR: {
+    status: 500,
+    message: "Router Not Found",
+  },
 };
 
 module.exports = { errors };

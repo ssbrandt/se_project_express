@@ -60,4 +60,54 @@ const deleteItem = (req, res) => {
     });
 };
 
-module.exports = { createItem, getItems, deleteItem };
+//like
+
+const likeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+    { new: true },
+  )
+    .orFail()
+    .then((item) => {
+      console.log(item);
+
+      res.send({ data: item });
+    })
+    .catch((e) => {
+      console.error(e.name);
+      if (e.name == "CastError" || e.name == "DocumentNotFoundError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
+      } else {
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message, e });
+      }
+    });
+};
+
+//unlike
+
+const dislikeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { new: true },
+  )
+    .orFail()
+    .then((item) => {
+      res.status(204).send({});
+    })
+    .catch((e) => {
+      console.error(e);
+      if (e.name == "CastError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
+      } else {
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
+      }
+    });
+};
+
+module.exports = { createItem, getItems, deleteItem, likeItem, dislikeItem };

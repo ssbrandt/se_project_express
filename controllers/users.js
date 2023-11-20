@@ -28,6 +28,9 @@ const getUser = (req, res) => {
         const error = errors.INVALID_REQUEST;
         console.log(errors.INVALID_REQUEST);
         res.status(error.status).send({ message: error.message });
+      } else if (e.name === "DocumentNotFoundError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
       } else {
         const error = errors.INTERNAL_SERVER_ERROR;
         res.status(error.status).send({ message: error.message });

@@ -51,6 +51,9 @@ const deleteItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name == "CastError") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "DocumentNotFoundError") {
         const error = errors.NOT_FOUND;
         res.status(error.status).send({ message: error.message });
       } else {
@@ -65,7 +68,7 @@ const deleteItem = (req, res) => {
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .orFail()
@@ -76,7 +79,10 @@ const likeItem = (req, res) => {
     })
     .catch((e) => {
       console.error(e.name);
-      if (e.name == "CastError" || e.name == "DocumentNotFoundError") {
+      if (e.name == "CastError") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "DocumentNotFoundError") {
         const error = errors.NOT_FOUND;
         res.status(error.status).send({ message: error.message });
       } else {
@@ -95,17 +101,18 @@ const dislikeItem = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => {
-      res.status(204).send({});
-    })
+    .then((item) => res.send({ data: item }))
     .catch((e) => {
       console.error(e);
-      if (e.name == "CastError") {
+      if (e.name == "CastError" || e.name === "Validation Error") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "DocumentNotFoundError") {
         const error = errors.NOT_FOUND;
         res.status(error.status).send({ message: error.message });
       } else {
         const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message });
+        res.status(error.status).send({ message: error.message, e });
       }
     });
 };

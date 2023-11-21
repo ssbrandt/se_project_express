@@ -4,7 +4,7 @@ const { errors } = require("../utils/errors");
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.status(200).send(users);
+      res.send({ users });
     })
     .catch((e) => {
       console.error(e);
@@ -52,10 +52,15 @@ const createUser = (req, res) => {
     })
     .catch((e) => {
       console.error(e);
-      if (e.name === "ValidationError" || e.name === "CastError") {
-        res.status(400).send({ message: "Invalid data input", e });
+      if (e.name === "ValidationError") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "CastError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
       } else {
-        res.status(500).send({ message: "Error from createItem", e });
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
       }
     });
 };

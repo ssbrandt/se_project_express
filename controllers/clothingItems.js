@@ -26,7 +26,7 @@ const createItem = (req, res) => {
     });
 };
 
-//get
+// get
 
 const getItems = (req, res) => {
   ClothingItem.find({})
@@ -38,19 +38,19 @@ const getItems = (req, res) => {
     });
 };
 
-//delete
+// delete
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   console.log(itemId);
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => {
-      res.status(204).send({});
+    .then(() => {
+      res.send({ message: "Item Deleted" });
     })
     .catch((e) => {
       console.error(e);
-      if (e.name == "CastError") {
+      if (e.name === "CastError") {
         const error = errors.INVALID_REQUEST;
         res.status(error.status).send({ message: error.message });
       } else if (e.name === "DocumentNotFoundError") {
@@ -63,7 +63,7 @@ const deleteItem = (req, res) => {
     });
 };
 
-//like
+// like
 
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
@@ -79,7 +79,7 @@ const likeItem = (req, res) => {
     })
     .catch((e) => {
       console.error(e.name);
-      if (e.name == "CastError") {
+      if (e.name === "CastError") {
         const error = errors.INVALID_REQUEST;
         res.status(error.status).send({ message: error.message });
       } else if (e.name === "DocumentNotFoundError") {
@@ -92,19 +92,19 @@ const likeItem = (req, res) => {
     });
 };
 
-//unlike
+// unlike
 
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .orFail()
     .then((item) => res.send({ data: item }))
     .catch((e) => {
       console.error(e);
-      if (e.name == "CastError" || e.name === "Validation Error") {
+      if (e.name === "CastError") {
         const error = errors.INVALID_REQUEST;
         res.status(error.status).send({ message: error.message });
       } else if (e.name === "DocumentNotFoundError") {

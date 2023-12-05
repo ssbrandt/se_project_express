@@ -22,14 +22,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validate: {
-      validator: (v) => validator.isEail(v),
+      validator: (v) => validator.isURL(v),
       messaige: "Email is not valid",
     },
   },
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });

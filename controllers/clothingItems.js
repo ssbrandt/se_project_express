@@ -2,15 +2,14 @@ const ClothingItem = require("../models/clothingItem");
 const { errors } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  const userId = req.user._id;
-
+  const owner = req.user._id;
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: userId })
+  ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
       console.log(item);
 
-      res.send({ data: item });
+      res.status(201).send({ data: item });
     })
     .catch((e) => {
       console.error(e);
@@ -48,7 +47,8 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (currentUser.toString() !== item.owner.toString()) {
-        return res.status(403).send({ message: "unauthorized" });
+        const error = errors.UNAUTHORIZED;
+        return res.status(error.status).send({ message: error.message });
       }
       res.send({ message: "Item Deleted" });
     })

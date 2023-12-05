@@ -15,6 +15,10 @@ const errors = {
     status: 409,
     message: "Record already exists",
   },
+  UNAUTHORIZED: {
+    status: 403,
+    message: "Unauthorized",
+  },
 };
 
 module.exports = { errors };

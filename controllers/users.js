@@ -17,7 +17,7 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
 
   User.findById(userId)
     .orFail()
@@ -29,7 +29,6 @@ const getUser = (req, res) => {
 
       if (e.name === "CastError") {
         const error = errors.INVALID_REQUEST;
-        console.log(errors.INVALID_REQUEST);
         res.status(error.status).send({ message: error.message });
       } else if (e.name === "DocumentNotFoundError") {
         const error = errors.NOT_FOUND;
@@ -45,34 +44,36 @@ const createUser = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, avatar, email } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  bcrypt.hash(req.body.password, 10),
-    then((hash) =>
-      User.create({ name, avatar, email, password: hash })
-        .then((user) => {
-          console.log(user);
+  bcrypt.hash(password, 10).then((hash) =>
+    User.create({ name, avatar, email, password: hash })
+      .then((user) => {
+        console.log(user);
+        const userData = user.toObject();
+        delete userData.password;
 
-          res.send({ data: user });
-        })
-        .catch((e) => {
-          console.error(e);
+        res.send({ data: userData });
+      })
+      .catch((e) => {
+        console.error(e.name);
+        console.error(e.code);
 
-          if (e.name === "ValidationError") {
-            const error = errors.INVALID_REQUEST;
-            res.status(error.status).send({ message: error.message });
-          } else if (e.name === "CastError") {
-            const error = errors.NOT_FOUND;
-            res.status(error.status).send({ message: error.message });
-          } else if (errors.code === 11000) {
-            const error = errors.CONFLICT_ERROR;
-            res.status(error.status).send({ message: error.message });
-          } else {
-            const error = errors.INTERNAL_SERVER_ERROR;
-            res.status(error.status).send({ message: error.message });
-          }
-        }),
-    );
+        if (e.code === 11000) {
+          const error = errors.CONFLICT_ERROR;
+          res.status(error.status).send({ message: error.message });
+        } else if (e.name === "ValidationError" || e.name === "Not Found") {
+          const error = errors.INVALID_REQUEST;
+          res.status(error.status).send({ message: error.message });
+        } else if (e.name === "CastError") {
+          const error = errors.NOT_FOUND;
+          res.status(error.status).send({ message: error.message });
+        } else {
+          const error = errors.INTERNAL_SERVER_ERROR;
+          res.status(error.status).send({ message: error.message });
+        }
+      }),
+  );
 };
 
 const login = (req, res) => {
@@ -88,26 +89,36 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch((e) => {
-      const error = errors.NOT_FOUND;
-      res.status(error.status).send({ message: error.message });
+      console.error(e);
+
+      if (e.name === "Error") {
+        res.status(400).send({ message: "custom error message" });
+      } else if (e.code === 11000) {
+        const error = errors.CONFLICT_ERROR;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "ValidationError" || e.name === "Not Found") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "CastError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
+      } else {
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message });
+      }
     });
 };
 
 const updateUser = (req, res) => {
-  const userId = req.user._id;
-  const { name, avatar } = req.body;
-
-  if (avatar && !validator.isURL(avatar)) {
-    return res.status(400).send({ message: "invalid URL " });
-  }
-
   return User.findByIdAndUpdate(
-    userId,
-    { $set: { name, avatar } },
+    req.user._id,
+    {
+      name: req.body.name,
+      avatar: req.body.avatar,
+    },
     { new: true, runValidators: true },
   )
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((user) => res.status(200).send({ user }))
     .catch((e) => {
       console.error(e);
 

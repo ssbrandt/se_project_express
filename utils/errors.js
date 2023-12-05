@@ -11,6 +11,10 @@ const errors = {
     status: 500,
     message: "An error has occurred on the server.",
   },
+  CONFLICT_ERROR: {
+    status: 409,
+    message: "Record already exists",
+  },
 };
 
 module.exports = { errors };

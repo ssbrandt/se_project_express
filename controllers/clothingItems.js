@@ -41,11 +41,15 @@ const getItems = (req, res) => {
 // delete
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const currentUser = req.user._id;
   console.log(itemId);
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then(() => {
+    .then((item) => {
+      if (currentUser.toString() !== item.owner.toString()) {
+        return res.status(403).send({ message: "unauthorized" });
+      }
       res.send({ message: "Item Deleted" });
     })
     .catch((e) => {

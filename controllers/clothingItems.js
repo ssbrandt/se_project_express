@@ -41,29 +41,19 @@ const getItems = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   const currentUser = req.user._id;
-  console.log(itemId);
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      if (currentUser.toString() !== item.owner.toString()) {
+      if (String(item.owner) !== currentUser) {
         const error = errors.UNAUTHORIZED;
         return res.status(error.status).send({ message: error.message });
       }
-      res.send({ message: "Item Deleted" });
+
+      return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
     })
     .catch((e) => {
       console.error(e);
-      if (e.name === "CastError") {
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
-      } else if (e.name === "DocumentNotFoundError") {
-        const error = errors.NOT_FOUND;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message });
-      }
     });
 };
 

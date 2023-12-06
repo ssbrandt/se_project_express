@@ -16,7 +16,7 @@ const errors = {
     message: "Record already exists",
   },
   UNAUTHORIZED: {
-    status: 403,
+    status: 401,
     message: "Unauthorized",
   },
 };

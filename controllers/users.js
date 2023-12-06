@@ -63,16 +63,8 @@ const createUser = (req, res) => {
     .catch((e) => {
       console.error(e);
 
-      if (e.code === 11000) {
-        const error = errors.CONFLICT_ERROR;
-        res.status(error.status).send({ message: error.message });
-      } else if (e.name === "ValidationError") {
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message });
-      }
+      const error = errors.INTERNAL_SERVER_ERROR;
+      res.status(error.status).send({ message: error.message });
     });
 };
 

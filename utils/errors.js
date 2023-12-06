@@ -19,6 +19,10 @@ const errors = {
     status: 401,
     message: "Unauthorized",
   },
+  FORBIDDEN: {
+    status: 403,
+    message: "Forbidden",
+  },
 };
 
 module.exports = { errors };

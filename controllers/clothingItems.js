@@ -46,7 +46,7 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (String(item.owner) !== currentUser) {
-        const error = errors.UNAUTHORIZED;
+        const error = errors.FORBIDDEN;
         return res.status(error.status).send({ message: error.message });
       }
 
@@ -54,6 +54,16 @@ const deleteItem = (req, res) => {
     })
     .catch((e) => {
       console.error(e);
+      if (e.name === "CastError") {
+        const error = errors.INVALID_REQUEST;
+        res.status(error.status).send({ message: error.message });
+      } else if (e.name === "DocumentNotFoundError") {
+        const error = errors.NOT_FOUND;
+        res.status(error.status).send({ message: error.message });
+      } else {
+        const error = errors.INTERNAL_SERVER_ERROR;
+        res.status(error.status).send({ message: error.message, e });
+      }
     });
 };
 

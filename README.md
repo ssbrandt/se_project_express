@@ -2,6 +2,10 @@
 
 The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.
 
+## WTWR (What to Wear?): Front End
+
+The front-end project is available [here] (https://github.com/ssbrandt/se_project_react)
+
 ## Running the Project
 
 `npm run start` — to launch the server

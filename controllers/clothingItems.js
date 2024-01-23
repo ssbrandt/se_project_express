@@ -1,7 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
 const { errors } = require("../utils/errors");
+const { BadRequestError } = require("../utils/BadRequestError");
+const { ForbiddenError } = require("../utils/ForbiddenError");
+const { NotFoundError } = require("../utils/NotFoundError");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const owner = req.user._id;
   const { name, weather, imageUrl } = req.body;
 
@@ -14,31 +17,25 @@ const createItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name === "ValidationError") {
-        console.error(e);
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        console.error(e);
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message });
+        next(new BadRequestError("Invalid request data"));
       }
+      next(e);
     });
 };
 
 // get
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch((e) => {
       console.error(e);
-      const error = errors.INTERNAL_SERVER_ERROR;
-      res.status(error.status).send({ message: error.message });
+      next(e);
     });
 };
 
 // delete
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const currentUser = req.user._id;
 
@@ -46,8 +43,7 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (String(item.owner) !== currentUser) {
-        const error = errors.FORBIDDEN;
-        return res.status(error.status).send({ message: error.message });
+        throw new ForbiddenError("Unauthorized action");
       }
 
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
@@ -55,15 +51,12 @@ const deleteItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name === "CastError") {
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
+        next(new BadRequestError("Invalid request data"));
       } else if (e.name === "DocumentNotFoundError") {
-        const error = errors.NOT_FOUND;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message, e });
+        next(new NotFoundError("Document not found"));
       }
+
+      next(e);
     });
 };
 
@@ -84,15 +77,11 @@ const likeItem = (req, res) => {
     .catch((e) => {
       console.error(e.name);
       if (e.name === "CastError") {
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
+        next(new BadRequestError("Invalid request data"));
       } else if (e.name === "DocumentNotFoundError") {
-        const error = errors.NOT_FOUND;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message, e });
+        next(new NotFoundError("Document not found"));
       }
+      next(e);
     });
 };
 
@@ -109,15 +98,11 @@ const dislikeItem = (req, res) => {
     .catch((e) => {
       console.error(e);
       if (e.name === "CastError") {
-        const error = errors.INVALID_REQUEST;
-        res.status(error.status).send({ message: error.message });
+        next(new BadRequestError("Invalid request data"));
       } else if (e.name === "DocumentNotFoundError") {
-        const error = errors.NOT_FOUND;
-        res.status(error.status).send({ message: error.message });
-      } else {
-        const error = errors.INTERNAL_SERVER_ERROR;
-        res.status(error.status).send({ message: error.message, e });
+        next(new NotFoundError("Document not found"));
       }
+      next(e);
     });
 };
 

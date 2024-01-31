@@ -1,5 +1,4 @@
 const ClothingItem = require("../models/clothingItem");
-const { errors } = require("../utils/errors");
 const { BadRequestError } = require("../utils/BadRequestError");
 const { ForbiddenError } = require("../utils/ForbiddenError");
 const { NotFoundError } = require("../utils/NotFoundError");
@@ -62,7 +61,7 @@ const deleteItem = (req, res, next) => {
 
 // like
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -87,7 +86,7 @@ const likeItem = (req, res) => {
 
 // unlike
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },

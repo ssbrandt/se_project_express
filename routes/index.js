@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const clothingItem = require("./clothingItems");
 const user = require("./users");
-const { errors } = require("../utils/errors");
 const { createUser, login } = require("../controllers/users");
 const { NotFoundError } = require("../utils/NotFoundError");
 const {

@@ -1,10 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const { errors } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 const { BadRequestError } = require("../utils/BadRequestError");
-const { ForbiddenError } = require("../utils/ForbiddenError");
 const { NotFoundError } = require("../utils/NotFoundError");
 const { ConflictError } = require("../utils/ConflictError");
 const { UnauthorizedError } = require("../utils/UnauthorizedError");
@@ -86,7 +84,7 @@ const login = (req, res, next) => {
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     {
